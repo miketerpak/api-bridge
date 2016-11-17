@@ -22,5 +22,11 @@
   "bugs": {
     "url": "https://github.com/miketerpak/api-bridge/issues"
   },
-  "homepage": "https://github.com/miketerpak/api-bridge#readme"
+  "homepage": "https://github.com/miketerpak/api-bridge#readme",
+  "dependencies": {
+    "lodash": "^4.17.2"
+  },
+  "peerDependencies": {
+    "express": "4.x"
+  }
 }
