@@ -1,0 +1,26 @@
+{
+  "name": "api-bridge",
+  "version": "1.0.0",
+  "description": "API versioning compatability tool for supporting multiple API versions under a single codebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miketerpak/api-bridge.git"
+  },
+  "keywords": [
+    "version",
+    "versioning",
+    "express",
+    "bridge",
+    "compatibility"
+  ],
+  "author": "Michael Terpak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/miketerpak/api-bridge/issues"
+  },
+  "homepage": "https://github.com/miketerpak/api-bridge#readme"
+}
