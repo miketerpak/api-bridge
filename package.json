@@ -4,7 +4,7 @@
   "description": "API versioning compatability tool for supporting multiple API versions under a single codebase",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "node test"
   },
   "repository": {
     "type": "git",

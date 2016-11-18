@@ -1,0 +1,43 @@
+[
+    {
+        "version": "1.1.0",
+        "description": "Added social interactions to users, removed 'object' field",
+        "gaps": [
+            {
+                "path": "/user/search",
+                "method": "get",
+                
+                "request": {
+                    "query": [
+                        {
+                            "$set": {
+                                "pagination": {}
+                            }
+                        },
+                        {
+                            "$move": {
+                                "limit": "pagination.limit",
+                                "last": "pagination.last"
+                            }
+                        }
+                    ]
+                },
+                "response": {
+                    "body": [
+                        {
+                            "$unset": ["$.following_count", "$.followed_count"],
+                            "$set": {
+                                "$.object": "user"
+                            }
+                        },
+                        {
+                            "$wrap": {
+                                "": "data"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]
