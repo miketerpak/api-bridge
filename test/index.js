@@ -1,42 +1,41 @@
 'use strict'
 
-const Gap = require('../lib/Gap')
+/**
+ * Testing for...
+ *      - Programatically generated Gaps
+ *      - Programatically generated bridges
+ *      - Bridges from json file
+ *      - Test request objects
+ *      - Test response objects
+ *      - Test reply objects
+ *      - Test $move
+ *      - Test $set
+ *      - Test $unset
+ *      - Test $cast
+ *      - Test $wrap
+ *      - Test $map
+ *      - Test $func
+ *      - Test $tag
+ */
 
-let gap = new Gap({
-    "path": "/user/search",
-    "method": "get",
-    
-    "request": {
-        "query": [
-            {
-                "$set": {
-                    "pagination": {}
-                }
-            },
-            {
-                "$move": {
-                    "limit": "pagination.limit",
-                    "last": "pagination.last"
-                }
-            }
-        ]
-    },
-    "response": {
-        "body": [
-            {
-                "$unset": ["$.following_count", "$.followed_count"],
-                "$set": {
-                    "$.object": "user"
-                }
-            },
-            {
-                "$wrap": {
-                    ".": "data"
-                }
-            }
-        ]
-    }
-})
+const Versioner = require('../index')
+const versioner = new Versioner({ path: '' })
+
+/**
+ * Function for unit testing
+ * 
+ * @param {string} msg message to display for a test
+ * @param {function} t a testing function which calls argument 0 on success and argument 1 on failure
+ * 
+ * @throws {*} on failure, messages are thrown as exceptions
+ */
+function test(msg, t) {
+    console.info(msg)
+    t(
+        () => { console.info('\x1b[32m Passed \x1b[0m') },
+        (err) => { throw err || 'Failed' }
+    )
+}
 
 let request = {
     query: {
@@ -75,26 +74,6 @@ let response = [
     }
 ]
 
-console.log('####################################################################')
-console.log()
-console.log('Unformatted request: ')
-console.log(JSON.stringify(request, null, 4))
-
-gap.applyToRequest(request)
-
-console.log()
-console.log()
-console.log('Formatted request: ')
-console.log(JSON.stringify(request, null, 4))
-
-console.log('####################################################################')
-console.log()
-console.log('Unformatted response: ')
-console.log(JSON.stringify(response, null, 4))
-
-response = gap.applyToResponse(response)
-
-console.log()
-console.log()
-console.log('Formatted response: ')
-console.log(JSON.stringify(response, null, 4))
+test('Testing JSON configuration, $set, $unset, $wrap and $move', (pass, fail) => {
+    versioner
+})
