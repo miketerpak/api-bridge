@@ -75,5 +75,5 @@ let response = [
 ]
 
 test('Testing JSON configuration, $set, $unset, $wrap and $move', (pass, fail) => {
-    versioner
+    
 })
