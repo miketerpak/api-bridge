@@ -1,9 +1,10 @@
 'use strict'
 
-const Bridge = require('lib/Bridge')
-const Errors = require('lib/Errors')
+const Bridge = require('./lib/Bridge')
+const Errors = require('./lib/Errors')
 const fs = require('fs')
-const Gap = require('lib/Gap')
+const Gap = require('./lib/Gap')
+const Operations = require('./lib/Operations')
 const Path = require('path')
 
 class Versioner {
@@ -64,20 +65,7 @@ class Versioner {
      * @returns {function[]} Middlewares in ascending order of version
      */
     errorHandler(err, req, res, next) {
-        // TODO Where to get version from?
-        let version = '1.0.0'
-        let middlewares = []
-
-        for (let i = this.bridges.length - 1; i >= 0; --i) {
-            if (this.bridges.version < version) {
-                middlewares.push(this.bridges[i].errorHandler.bind(this.bridges[i]))
-            }
-        }
-
-        // Final middleware to send the error response
-        middlewares.push((_err, _req, _res) => _res.send(_err, true))
-
-        return middlewares
+        return this.bridges.map(bridge => bridge.errorHandler.bind(bridge))
     }
 
     /**
@@ -87,10 +75,11 @@ class Versioner {
      * 
      * @returns {Bridge[]}
      * @throws {FormattingError} errors thrown for invalid file formatting
+     * @throws {SyntaxError} errors thrown parsing JSON
      * @throws {Error} errors thrown by file io
      */
     loadFromFile(path) {
-        let data = fs.readFileSync(Path.normalize(path))
+        let data = JSON.parse(fs.readFileSync(Path.normalize(path)))
         let bridges = []
 
         if (!Array.isArray(data)) data = [data]
@@ -108,33 +97,21 @@ class Versioner {
             for (let _gap of _data.gaps) {
                 _bridge.addGap(new Gap(_gap))
             }
+
+            bridges.push(_bridge)
         }
+
+        return bridges
     }
 
     /**
-     * Express middleware for automatically applying formatting
+     * Express middlewares for automatically applying formatting
      * to the server's requests and responses
-     * 
-     * @see ExpressJS middleware
-     * 
-     * @param {express.Request} req
-     * @param {express.Response} res
-     * @param {function} next
      * 
      * @returns {function[]} Middlewares in ascending order of version
      */
-    middleware(req, res, next) {
-        // TODO Where to get version from?
-        let version = '1.0.0'
-        let middlewares = []
-
-        for (let i = 0; i < this.bridges.length; ++i) {
-            if (this.bridges.version > version) {
-                middlewares.push(this.bridges[i].middleware.bind(this.bridges[i]))
-            }
-        }
-
-        return middlewares
+    middleware() {
+        return this.bridges.map(bridge => bridge.middleware.bind(bridge))
     }
 
     /**
@@ -143,7 +120,7 @@ class Versioner {
      * the Versioner.bridges array.
      */
     sortBridges() {
-        this.bridges = this.bridges.sort((a, b) => a.version - b.version)
+        this.bridges = this.bridges.sort((a, b) => Operations.versionSort(a.version - b.version))
     }
 }
 
