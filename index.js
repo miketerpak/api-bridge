@@ -5,7 +5,6 @@ const Errors = require('./lib/Errors')
 const fs = require('fs')
 const Gap = require('./lib/Gap')
 const Operations = require('./lib/Operations')
-const Path = require('path')
 
 class Versioner {
 
@@ -79,7 +78,7 @@ class Versioner {
      * @throws {Error} errors thrown by file io
      */
     loadFromFile(path) {
-        let data = JSON.parse(fs.readFileSync(Path.normalize(path)))
+        let data = JSON.parse(fs.readFileSync(path))
         let bridges = []
 
         if (!Array.isArray(data)) data = [data]
@@ -120,11 +119,12 @@ class Versioner {
      * the Versioner.bridges array.
      */
     sortBridges() {
-        this.bridges = this.bridges.sort((a, b) => Operations.versionSort(a.version - b.version))
+        this.bridges = this.bridges.sort((a, b) => Bridge.compareVersionStrings(a.version - b.version))
     }
 }
 
 module.exports = Versioner
 module.exports.Bridge = Bridge
+module.exports.Gap = Gap
 module.exports.InvalidOperationError = Errors.InvalidOperationError
 module.exports.FormattingError = Errors.FormattingError
