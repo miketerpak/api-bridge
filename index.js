@@ -47,7 +47,7 @@ class Versioner {
             this.bridges.push(_bridge)
         }
 
-        this.sortBridges()
+        this.bridges.sort((a, b) => a.compareVersions(b))
     }
 
     /**
@@ -64,7 +64,16 @@ class Versioner {
      * @returns {function[]} Middlewares in ascending order of version
      */
     errorHandler(err, req, res, next) {
-        return this.bridges.map(bridge => bridge.errorHandler.bind(bridge))
+        return (req, res, next) => {
+            for (let _gap of res.__versioner_parameters.response_gaps) {
+                // TODO test if these break when not set on the Gap
+                // gap.error('headers').process(req.headers) // TODO headers
+                err = _gap.error('body').process(err)
+            }
+
+            res.__versioner_parameters.skip_formatting = true
+            res.send(err) // 2nd argument for skipping response formatting
+        }
     }
 
     /**
@@ -110,16 +119,46 @@ class Versioner {
      * @returns {function[]} Middlewares in ascending order of version
      */
     middleware() {
-        return this.bridges.map(bridge => bridge.middleware.bind(bridge))
-    }
+        return (req, res, next) => {
+            res.__versioner_parameters = {
+                response_gaps: [] // Will be in reverse order from bridges
+            }
 
-    /**
-     * Re-sorts the bridges by version name.
-     * NOTE: This should be called after any manipulation of
-     * the Versioner.bridges array.
-     */
-    sortBridges() {
-        this.bridges = this.bridges.sort((a, b) => Bridge.compareVersionStrings(a.version - b.version))
+            for (let bridge of this.bridges) {
+                if (bridge.compareVersions(res.locals.version) <= 0) continue
+
+                let gap = bridge.getGap(req.method, req.path)
+                if (gap === undefined) continue
+                if (gap.shouldReply(res)) {
+                    // Response was sent from inside Gap#shouldReply
+                    return
+                }
+
+                // TODO test if these break when not set on the Gap
+                gap.request('headers').process(req.headers)
+                gap.request('body').process(req.body)
+                gap.request('query').process(req.query)
+                gap.request('params').process(req.params)
+
+                res.__versioner_parameters.gaps.unshift(gap)
+            }
+
+            let tmp = res.send.bind(res)
+            res.send = function(data) {
+                if (res.__versioner_parameters.skip_formatting) {
+                    return tmp(data)
+                }
+
+                for (let _gap of res.__versioner_parameters.response_gaps) {
+                    // TODO headers
+                    data = _gap.response('body').process(data)
+                }
+
+                tmp(data)
+            }
+
+            next()
+        }
     }
 }
 

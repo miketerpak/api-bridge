@@ -119,16 +119,16 @@ describe('Gap', function() {
         })
 
         it('should add a step to the end of the steps array', function() {
-            _gap.addOperation('request', 'body', { $tag: 'fifth', $set: { eyy: 'ohh' } })
-            assert.equal(_gap.request.body[3].$tag, 'fifth')
+            _gap.request('body').add({ $tag: 'fifth', $set: { eyy: 'ohh' } })
+            assert.equal(_gap.request('body').get(3).$tag, 'fifth')
         })
         it('should add a step after the step tagged "first"', function() {
-            _gap.addOperation('request', 'body', { $tag: 'second', $set: { eyy: 'ohh' } }, { after: 'first' })
-            assert.equal(_gap.request.body[2].$tag, 'second')
+            _gap.request('body').add({ $tag: 'second', $set: { eyy: 'ohh' } }, { after: 'first' })
+            assert.equal(_gap.request('body').get(2).$tag, 'second')
         })
         it('should add a step before the step tagged "fifth"', function() {
-            _gap.addOperation('request', 'body', { $tag: 'fourth', $set: { eyy: 'ohh' } }, { before: 'fifth' })
-            assert.equal(_gap.request.body[4].$tag, 'fourth')
+            _gap.request('body').add({ $tag: 'fourth', $set: { eyy: 'ohh' } }, { before: 'fifth' })
+            assert.equal(_gap.request('body').get(4).$tag, 'fourth')
         })
     })
 })
