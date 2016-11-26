@@ -65,6 +65,11 @@ class Versioner {
      */
     errorHandler(err, req, res, next) {
         return (req, res, next) => {
+            let headers = {}
+            for (let key of res._headerNames) {
+                
+            }
+
             for (let _gap of res.__versioner_parameters.response_gaps) {
                 // TODO test if these break when not set on the Gap
                 // gap.error('headers').process(req.headers) // TODO headers
