@@ -12,3 +12,4 @@
 
 require('./operations')
 require('./gap')
+require('./versioner')

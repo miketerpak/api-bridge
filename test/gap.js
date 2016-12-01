@@ -131,4 +131,15 @@ describe('Gap', function() {
             assert.equal(_gap.request('body').get(4).$tag, 'fourth')
         })
     })
+
+    describe('#hash', function() {
+        let _gap = new Gap({
+            path: '/test',
+            method: 'get'
+        })
+
+        it('should hash to an expected value', function() {
+            assert.equal(_gap.hash(), 'GET /test')
+        })
+    })
 })

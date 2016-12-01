@@ -67,14 +67,18 @@ class Versioner {
         return (req, res, next) => {
             let headers = {}
             for (let key of res._headerNames) {
-                
+                headers[res._headerNames[key]] = res._headers[key]
             }
 
             for (let _gap of res.__versioner_parameters.response_gaps) {
                 // TODO test if these break when not set on the Gap
-                // gap.error('headers').process(req.headers) // TODO headers
+                gap.error('headers').process(headers)
                 err = _gap.error('body').process(err)
             }
+
+            res._headers = {}
+            res._headerNames = {}
+            res.set(headers)
 
             res.__versioner_parameters.skip_formatting = true
             res.send(err) // 2nd argument for skipping response formatting
@@ -153,11 +157,19 @@ class Versioner {
                 if (res.__versioner_parameters.skip_formatting) {
                     return tmp(data)
                 }
+                let headers = {}
+                for (let key of res._headerNames) {
+                    headers[res._headerNames[key]] = res._headers[key]
+                }
 
                 for (let _gap of res.__versioner_parameters.response_gaps) {
-                    // TODO headers
+                    headers = _gap.response('headers').process(headers)
                     data = _gap.response('body').process(data)
                 }
+
+                res._headers = {}
+                res._headerNames = {}
+                res.set(headers)
 
                 tmp(data)
             }
