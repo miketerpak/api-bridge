@@ -149,4 +149,141 @@ describe('Operations', function() {
             assert(false, 'NOT IMPLEMENTED')
         })
     })
+
+    describe('Set', function() {
+        let OpSet
+
+        it('should construct an op set containing a single $set operation', function() {
+            OpSet = new Operations.Set([
+                {
+                    $tag: 'first',
+                    $set: {
+                        temp: 'value',
+                        isTest: true
+                    }
+                }
+            ])
+
+            assert.equal(OpSet.operations.length, 1)
+        })
+        
+        describe('#add', function() {
+            it('should add a new $unset operation to the set', function() {
+                OpSet.add({
+                    $tag: 'fifth',
+                    $unset: 'result.temp'
+                })
+
+                assert.equal(OpSet.operations.length, 2)
+                assert.equal(OpSet.operations[1].$tag, 'fifth')
+            })
+
+            it('should use `at` to add op at position 1 in the op set', function() {
+                OpSet.add({
+                    $tag: 'third',
+                    $wrap: 'result'
+                }, {
+                    at: 1
+                })
+
+                assert.equal(OpSet.operations.length, 3)
+                assert.equal(OpSet.operations[0].$tag, 'first')
+                assert.equal(OpSet.operations[1].$tag, 'third')
+                assert.equal(OpSet.operations[2].$tag, 'fifth')
+            })
+
+            it('should add an operation before $tag=third in the op set', function() {
+                OpSet.add({
+                    $tag: 'second',
+                    $set: { code: 705 }
+                }, {
+                    before: 'third'
+                })
+
+                assert.equal(OpSet.operations.length, 4)
+                assert.equal(OpSet.operations[0].$tag, 'first')
+                assert.equal(OpSet.operations[1].$tag, 'second')
+                assert.equal(OpSet.operations[2].$tag, 'third')
+                assert.equal(OpSet.operations[3].$tag, 'fifth')
+            })
+
+            it('should add an operation after $tag=third in the op set', function() {
+                OpSet.add({
+                    $tag: 'fourth',
+                    $move: { 'result.code': 'result.status' }
+                }, {
+                    after: 'third'
+                })
+
+                assert.equal(OpSet.operations.length, 5)
+                assert.equal(OpSet.operations[0].$tag, 'first')
+                assert.equal(OpSet.operations[1].$tag, 'second')
+                assert.equal(OpSet.operations[2].$tag, 'third')
+                assert.equal(OpSet.operations[3].$tag, 'fourth')
+                assert.equal(OpSet.operations[4].$tag, 'fifth')
+            })
+        })
+
+        describe('#getIndexByTag', function() {
+            it('should return the correct index of the operation with the given tag', function() {
+                assert.equal(OpSet.getIndexByTag('third'), 2)
+            })
+        })
+
+        describe('#get', function() {
+            it('should return the operation by $tag', function() {
+                assert.deepStrictEqual(OpSet.get('second'), {
+                    $tag: 'second',
+                    $set: { code: 705 }
+                })
+            })
+
+            it('should return the operation at a given index', function() {
+                assert.deepStrictEqual(OpSet.get(3), {
+                    $tag: 'fourth',
+                    $move: { 'result.code': 'result.status' }
+                })
+            })
+        })
+
+        describe('#remove', function() {
+            it('should remove the operation with the given $tag', function() {
+                assert.deepStrictEqual(OpSet.remove('fourth'), {
+                    $tag: 'fourth',
+                    $move: { 'result.code': 'result.status' }
+                })
+                assert.equal(OpSet.operations.length, 4)
+                assert.equal(OpSet.operations[0].$tag, 'first')
+                assert.equal(OpSet.operations[1].$tag, 'second')
+                assert.equal(OpSet.operations[2].$tag, 'third')
+                assert.equal(OpSet.operations[3].$tag, 'fifth')
+            })
+        })
+
+        describe('#process', function() {
+            it('should correctly process a given object based on the operations', function() {
+                let now = Date.now()
+                assert.deepStrictEqual(
+                    OpSet.process({
+                        data: 'heyo this is a test',
+                        time: now
+                    }),
+                    {
+                        result: {
+                            data: 'heyo this is a test',
+                            time: now,
+                            isTest: true,
+                            code: 705
+                        }
+                    }
+                )
+            })
+        })
+
+        describe('#verify', function() {
+            it('TODO UNFINISHED', function() {
+
+            })
+        })
+    })
 })

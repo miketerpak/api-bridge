@@ -1,5 +1,21 @@
 [
     {
+        "version": "2.0.0",
+        "description": "All user endpoints are wrapped in arrays",
+        "gaps": [
+            {
+                "path": "/user/*",
+                "method": "get",
+                
+                "response": {
+                    "body": {
+                        "$wrap": []
+                    }
+                }
+            }
+        ]
+    },
+    {
         "version": "1.1.0",
         "description": "Added social interactions to users, removed 'object' field",
         "gaps": [
