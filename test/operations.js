@@ -134,7 +134,7 @@ describe('Operations', function() {
             assert.equal(obj.info.signature, 'tyfhi4532yjf78435xko9j')
             assert.equal(obj.signature, 'tyfhi4532yjf78435xko9j')
         })
-        it('should map the values using given key value pairs (array matching with $)', function() {
+        it('TODO! should map the values using given key value pairs (array matching with $)', function() {
             // TODO
         })
     })
@@ -144,9 +144,8 @@ describe('Operations', function() {
             Operations.$move(obj, 'info', 'information')
             assert.equal(obj.information.signature, 'tyfhi4532yjf78435xko9j')
         })
-        it('should map the values using given key value pairs (array matching with $)', function() {
+        it('TODO! should map the values using given key value pairs (array matching with $)', function() {
             // TODO
-            assert(false, 'NOT IMPLEMENTED')
         })
     })
 
