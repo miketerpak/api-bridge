@@ -9,37 +9,66 @@ describe('Gap', function() {
         method: 'GET',
 
         request: {
-            params: {
-
-            },
+            params: [
+                { $wrap: 'one' },
+                { $wrap: [] },
+                { $wrap: 'two' }
+            ],
             query: {
-
+                $copy: {
+                    'user.name': 'user.full_name',
+                    'user.age': 'age'
+                }
             },
             body: {
-
+                $unset: 'oldParam',
+                $set: {
+                    newParam: true
+                },
+                $func: obj => {
+                    obj.name = obj.name.toUpperCase()
+                    return obj
+                }
             },
             headers: {
-
+                $set: {
+                    '': {
+                        'Content-Type': 'text/plain',
+                        'Authorization': 'Bearer 12345'
+                    }
+                }
             }
         },
         response: {
-            body: {
-
-            },
+            body: [
+                { $wrap: 'result' },
+                { $map: {
+                  'result.code': {
+                      '200': 'OK',
+                      '404': 'NOT FOUND',
+                      '500': 'ERROR',
+                      '': 'UNKNOWN'
+                  }
+                } }
+            ],
             headers: {
-
-            },
-            status: 200
+                $move: {
+                    'x-auth': 'Authorization'
+                }
+            }
         },
         error: {
             body: {
-
+                $cast: {
+                    cast: 'number'
+                }
             },
             headers: {
-
-            },
-            status: {
-
+                $set: {
+                    '': {
+                        header1: '3'
+                    }
+                }
             }
         }
     })
@@ -53,6 +82,17 @@ describe('Gap', function() {
             },
             body: '{"error":"not-found","code":404}'
         }
+    })
+
+    describe('#hash', function() {
+        let _gap = new Gap({
+            path: '/test',
+            method: 'get'
+        })
+
+        it('should hash to an expected value', function() {
+            assert.equal(_gap.hash(), 'GET /test')
+        })
     })
 
     describe('#test', function() {
@@ -132,14 +172,105 @@ describe('Gap', function() {
         })
     })
 
-    describe('#hash', function() {
-        let _gap = new Gap({
-            path: '/test',
-            method: 'get'
+    describe('#error', function() {
+        describe("'headers'", function() {
+            it('should properly format the error response headers', function() {
+                let headers = {
+                    eyyy: 'ohhhh',
+                    eyy: 'ohh',
+                    eyyyyyyyyy: 'ohhhhhhhhhh'
+                }
+                headers = gap_respond.error('headers').process(headers)
+                assert.deepStrictEqual(headers, {
+                    header1: '3'
+                })
+            })
         })
+        describe("'body'", function() {
+            it('should properly format the error response body', function() {
+                let body = { cast: '8' }
+                body = gap_respond.error('body').process(body)
+                assert.deepStrictEqual(body, { cast: 8 })
+            })
+        })
+    })
 
-        it('should hash to an expected value', function() {
-            assert.equal(_gap.hash(), 'GET /test')
+    describe('#response', function() {
+        describe("'headers'", function() {
+            it('should properly format the response headers', function() {
+                let headers = { 'Content-Type': 'text/plain', 'x-auth': 'Bearer 12345' }
+                headers = gap_respond.response('headers').process(headers)
+                assert.deepStrictEqual(headers, {
+                    'Content-Type': 'text/plain',
+                    'Authorization': 'Bearer 12345'
+                })
+            })
+        })
+        describe("'body'", function() {
+            it('should properly format the response body', function() {
+                let body = { code: 404 }
+                body = gap_respond.response('body').process(body)
+                assert.deepStrictEqual(body, { result: { code: 'NOT FOUND' } })
+            })
+        })
+    })
+
+    describe('#request', function() {
+        describe("'headers'", function() {
+            it('should properly format the request headers', function() {
+                let headers = {
+                    header1: 1,
+                    header2: 2,
+                    header3: 3
+                }
+
+                headers = gap_respond.request('headers').process(headers)
+                assert.deepStrictEqual(headers, {
+                    'Content-Type': 'text/plain',
+                    'Authorization': 'Bearer 12345'
+                })
+            })
+        })
+        describe("'body'", function() {
+            it('should properly format the request body', function() {
+                let body = { oldParam: 'useless', name: 'billy billy' }
+                body = gap_respond.request('body').process(body)
+                assert.deepStrictEqual(body, { name: 'BILLY BILLY', newParam: true })
+            })
+        })
+        describe("'query'", function() {
+            it('should properly format the request querystring', function() {
+                let query = {
+                    user: {
+                        name: 'Billy Billy',
+                        age: 705
+                    }
+                }
+                query = gap_respond.request('query').process(query)
+                assert.deepStrictEqual(query, {
+                    age: 705,
+                    user: {
+                        name: 'Billy Billy',
+                        full_name: 'Billy Billy',
+                        age: 705
+                    }
+                })
+            })
+        })
+        describe("'params'", function() {
+            it('should properly format the request URL params', function() {
+                let params = { test: true }
+                params = gap_respond.request('params').process(params)
+                assert.deepStrictEqual(params, {
+                    two: [
+                        {
+                            one: {
+                                test: true
+                            }
+                        }
+                    ]
+                })
+            })
         })
     })
 })

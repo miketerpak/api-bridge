@@ -2,14 +2,7 @@
 
 /**
  * Testing for...
- *      - Programatically generated Gaps
- *      - Programatically generated bridges
- *      - Bridges from json file
- *      - Test request objects
- *      - Test response objects
- *      - Test reply objects
- *      - Test $copy
- *      - Test $move
+ *      - OPERATION SET TESTS
  *      - Test $func
  *      - Test $tag
  */
@@ -27,48 +20,6 @@ const Operations = require('../lib/Operations')
  * 
  * @returns {boolean}
  */
-// function compareObjects(o1, o2) {
-//     if (typeof o1 !== 'object' || typeof o2 !== 'object') {
-//         return o1 === o2
-//     }
-
-//     if (Array.isArray(o1)) {
-//         if (Array.isArray(o2) && o1.length === o2.length) {
-//             for (let i = o1.length - 1; i >= 0; --i) {
-//                 if (!compareObjects(o1[i], o2[i])) {
-//                     return false
-//                 }
-//             }
-
-//             return true
-//         } else {
-//             return false
-//         }
-//     } else if (Array.isArray(o2)) {
-//         return false
-//     }
-
-//     let o1_keys = Object.keys(o1).sort()
-//     let o2_keys = Object.keys(o2).sort()
-
-//     if (o1_keys.length !== o2_keys.length) return false
-
-//     for (let i = o1_keys.length - 1; i >= 0; --i) {
-//         if (o1_keys[i] !== o2_keys[i]) {
-//             return false
-//         }
-
-//         if (typeof o1[o1_keys[i]] === 'object' || typeof o2[o2_keys[i]] === 'object') {
-//             if (!compareObjects(o1[o1_keys[i]], o2[o2_keys[i]])) {
-//                 return false
-//             }
-//         } else if (o1[o1_keys[i]] !== o2[o2_keys[i]]) {
-//             return false
-//         }
-//     }
-
-//     return true
-// }
 
 describe('Operations', function() {
     let obj = {
