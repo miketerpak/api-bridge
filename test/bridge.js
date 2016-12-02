@@ -9,7 +9,7 @@ describe('Bridge', function() {
 
 	describe('#constructor', function() {
 		it('should initialize with a single gap', function() {
-			let gap = new Gap({
+			const gap = new Gap({
 				path: '/user/*',
 				method: 'get',
 				description: 'testing123',
@@ -33,9 +33,9 @@ describe('Bridge', function() {
 			assert.equal(bridge.compareVersions('2.3'), -1)
 		})
 		it('should compare itself to the version of another bridge', function() {
-			let b1 = new Bridge({ version: '1.6.4' })
-			let b2 = new Bridge({ version: '1.6.2' })
-			let b3 = new Bridge({ version: '3.9.14' })
+			const b1 = new Bridge({ version: '1.6.4' })
+			const b2 = new Bridge({ version: '1.6.2' })
+			const b3 = new Bridge({ version: '3.9.14' })
 
 			assert.equal(b1.compareVersions(b2), 1)
 			assert.equal(b1.compareVersions(b1), 0)
@@ -54,7 +54,7 @@ describe('Bridge', function() {
 
 	describe('#addGap', function() {
 		it('should add a new gap under the bridge', function() {
-			let gap = new Gap({
+			const gap = new Gap({
 				path: '/car',
 				method: 'get',
 				description: 'testing321',

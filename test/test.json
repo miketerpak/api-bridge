@@ -7,7 +7,7 @@
                 "path": "/user/*",
                 "method": "get",
                 
-                "response": {
+                "error": {
                     "body": {
                         "$wrap": []
                     }

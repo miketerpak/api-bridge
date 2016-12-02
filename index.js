@@ -72,8 +72,8 @@ class Versioner {
      * 
      * @returns {function[]} Middlewares in ascending order of version
      */
-    errorHandler(err, req, res, next) {
-        return (req, res, next) => {
+    errorHandler() {
+        return (err, req, res, next) => {
             let headers = {}
             for (let key of res._headerNames) {
                 headers[res._headerNames[key]] = res._headers[key]
