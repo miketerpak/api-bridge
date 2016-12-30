@@ -75,7 +75,7 @@ class Versioner {
     errorHandler() {
         return (err, req, res, next) => {
             let headers = {}
-            for (let key of res._headerNames) {
+            for (let key of Object.keys(res._headerNames)) {
                 headers[res._headerNames[key]] = res._headers[key]
             }
 
