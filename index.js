@@ -81,7 +81,7 @@ class Versioner {
 
             for (let _gap of res.__versioner_parameters.response_gaps) {
                 // TODO test if these break when not set on the Gap
-                gap.error('headers').process(headers)
+                _gap.error('headers').process(headers)
                 err = _gap.error('body').process(err)
             }
 
