@@ -158,7 +158,7 @@ class Versioner {
                 gap.request('query').process(req.query)
                 gap.request('params').process(req.params)
 
-                res.__versioner_parameters.response_gaps.unshift(gap)
+                res.__versioner_parameters.response_gaps.push(gap)
             }
 
             let tmp = res.send.bind(res)
