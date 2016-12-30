@@ -167,7 +167,7 @@ class Versioner {
                     return tmp(data)
                 }
                 let headers = {}
-                for (let key of res._headerNames) {
+                for (let key of Object.keys(res._headerNames)) {
                     headers[res._headerNames[key]] = res._headers[key]
                 }
 
