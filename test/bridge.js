@@ -29,8 +29,11 @@ describe('Bridge', function() {
 	describe('#compareVersions', function() {
 		it('should compare itself to version strings', function() {
 			assert.equal(bridge.compareVersions('0.5'), 1)
+			assert.equal(bridge.compareVersions('0.5.0'), 1)
 			assert.equal(bridge.compareVersions('1.0'), 0)
+			assert.equal(bridge.compareVersions('1.0.0'), 0)
 			assert.equal(bridge.compareVersions('2.3'), -1)
+			assert.equal(bridge.compareVersions('2.3.0'), -1)
 		})
 		it('should compare itself to the version of another bridge', function() {
 			const b1 = new Bridge({ version: '1.6.4' })
