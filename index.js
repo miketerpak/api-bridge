@@ -74,6 +74,11 @@ class Versioner {
      */
     errorHandler() {
         return (err, req, res, next) => {
+            // If the middleware was never called for any reason, return the unchanged error response
+            if (!res.__versioner_parameters) {
+                return res.send(err);
+            }
+
             let headers = {}
             for (let key of Object.keys(res._headerNames)) {
                 headers[res._headerNames[key]] = res._headers[key]
