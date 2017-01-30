@@ -21,8 +21,8 @@ describe('Bridge', function() {
 				gaps: [ gap ]
 			})
 
-			assert.equal(bridge.gap_map.size, 1)
-			assert.equal(bridge.gap_map.values().next().value.description, 'testing123')
+			assert.equal(bridge.gapMap.size, 1)
+			assert.equal(bridge.gapMap.values().next().value.description, 'testing123')
 		})
 	})
 

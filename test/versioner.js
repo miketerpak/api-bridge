@@ -42,8 +42,6 @@ function makeRequest(send) {
 }
 
 describe('Versioner', function() {
-	let versioner
-
 	describe('#addBridges', function() {
 		it('should add a bridge to the versioner', function() {
 			const _b1 = new Bridge({ version: '1.6' })
@@ -63,17 +61,18 @@ describe('Versioner', function() {
 
 	describe('#loadFromFile', function() {
 		it('should correctly load and parse json file', function() {
-			versioner = new Versioner({ path: './test/test.json' })
-			assert.equal(versioner.bridges.length, 2)
-			assert.equal(versioner.bridges[0].gap_map.size, 1)
-			assert.equal(versioner.bridges[1].gap_map.size, 1)
+			let versioner = new Versioner({ path: './test/test.json' })
+			assert.equal(versioner.bridges.length, 3)
+			assert.equal(versioner.bridges[0].gapMap.size, 1)
+			assert.equal(versioner.bridges[1].gapMap.size, 1)
+			assert.equal(versioner.bridges[2].gapMap.size, 5)
 		})
 	})
 
 	describe('#errorHandler', function() {
 		it('should correctly process an error response object', function(done) {
+			let versioner = new Versioner({ path: './test/test.json' })
 			let { req, res } = makeRequest(result => {
-				// TODO asserts
 				if (!Array.isArray(result)) {
 					done(new Error('Unexpected result; expected array, got ' + typeof result))
 				} else if (result.length !== 1) {
@@ -87,6 +86,7 @@ describe('Versioner', function() {
 
 			req.method = 'GET'
 			req.path = '/user/test'
+			res.locals.version = '1.0'
 
 			versioner.middleware()(req, res, () => {})
 			versioner.errorHandler()({ test: 'ing' }, req, res, () => {})

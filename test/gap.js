@@ -4,7 +4,7 @@ const assert = require('assert')
 const Gap = require('../lib/Gap')
 
 describe('Gap', function() {
-    let gap_respond = new Gap({
+    let gapRespond = new Gap({
         path: '/user',
         method: 'GET',
 
@@ -72,7 +72,7 @@ describe('Gap', function() {
             }
         }
     })
-    let gap_reply = new Gap({
+    let gapReply = new Gap({
         path: '/user',
         method: 'post',
         reply: {
@@ -131,13 +131,13 @@ describe('Gap', function() {
         }
 
         it('should return false if `reply` is not set', function() {
-            assert.equal(gap_respond.shouldReply(res), false)
+            assert.equal(gapRespond.shouldReply(res), false)
             assert.equal(res._status, -1)
             assert.equal(res._body, null)
             assert.equal(Object.keys(res._headers).length, 0)
         })
         it('should send a response, since reply is set', function() {
-            assert.equal(gap_reply.shouldReply(res), true)
+            assert.equal(gapReply.shouldReply(res), true)
             assert.equal(res._status, 404)
             assert.equal(res._body, '{"error":"not-found","code":404}')
             assert.equal(Object.keys(res._headers).length, 1)
@@ -180,7 +180,7 @@ describe('Gap', function() {
                     eyy: 'ohh',
                     eyyyyyyyyy: 'ohhhhhhhhhh'
                 }
-                headers = gap_respond.error('headers').process(headers)
+                headers = gapRespond.error('headers').process(headers)
                 assert.deepStrictEqual(headers, {
                     header1: '3'
                 })
@@ -189,7 +189,7 @@ describe('Gap', function() {
         describe("'body'", function() {
             it('should properly format the error response body', function() {
                 let body = { cast: '8' }
-                body = gap_respond.error('body').process(body)
+                body = gapRespond.error('body').process(body)
                 assert.deepStrictEqual(body, { cast: 8 })
             })
         })
@@ -199,7 +199,7 @@ describe('Gap', function() {
         describe("'headers'", function() {
             it('should properly format the response headers', function() {
                 let headers = { 'Content-Type': 'text/plain', 'x-auth': 'Bearer 12345' }
-                headers = gap_respond.response('headers').process(headers)
+                headers = gapRespond.response('headers').process(headers)
                 assert.deepStrictEqual(headers, {
                     'Content-Type': 'text/plain',
                     'Authorization': 'Bearer 12345'
@@ -209,7 +209,7 @@ describe('Gap', function() {
         describe("'body'", function() {
             it('should properly format the response body', function() {
                 let body = { code: 404 }
-                body = gap_respond.response('body').process(body)
+                body = gapRespond.response('body').process(body)
                 assert.deepStrictEqual(body, { result: { code: 'NOT FOUND' } })
             })
         })
@@ -224,7 +224,7 @@ describe('Gap', function() {
                     header3: 3
                 }
 
-                headers = gap_respond.request('headers').process(headers)
+                headers = gapRespond.request('headers').process(headers)
                 assert.deepStrictEqual(headers, {
                     'Content-Type': 'text/plain',
                     'Authorization': 'Bearer 12345'
@@ -234,7 +234,7 @@ describe('Gap', function() {
         describe("'body'", function() {
             it('should properly format the request body', function() {
                 let body = { oldParam: 'useless', name: 'billy billy' }
-                body = gap_respond.request('body').process(body)
+                body = gapRespond.request('body').process(body)
                 assert.deepStrictEqual(body, { name: 'BILLY BILLY', newParam: true })
             })
         })
@@ -246,7 +246,7 @@ describe('Gap', function() {
                         age: 705
                     }
                 }
-                query = gap_respond.request('query').process(query)
+                query = gapRespond.request('query').process(query)
                 assert.deepStrictEqual(query, {
                     age: 705,
                     user: {
@@ -260,7 +260,7 @@ describe('Gap', function() {
         describe("'params'", function() {
             it('should properly format the request URL params', function() {
                 let params = { test: true }
-                params = gap_respond.request('params').process(params)
+                params = gapRespond.request('params').process(params)
                 assert.deepStrictEqual(params, {
                     two: [
                         {
