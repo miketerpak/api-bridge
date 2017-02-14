@@ -25,7 +25,8 @@ class Versioner {
      * @param {Bridge[]} options.bridges optional, any programatically generated Bridges
      */
     constructor({ path, bridges = [] } = {}) {
-        this.bridges = []
+        this.bridges = [] // Stores the bridges in version-order so that it can be traversed linearly in order to apply any necessary version changes
+        this.bridge_map = {} // Used to reference bridges by version string
 
         if (!Array.isArray(bridges)) {
             bridges = [bridges]
@@ -54,9 +55,29 @@ class Versioner {
             }
 
             this.bridges.push(_bridge)
+            this.bridge_map[_bridge.version] = _bridge
         }
 
         this.bridges.sort((a, b) => a.compareVersions(b))
+    }
+
+    /**
+     * Gets a bridge by version number.
+     * 
+     * @param {string} version_code
+     * @param {boolean} [generate_new=true] If true, generates a blank bridge that is added to the versioner's bridges and returned
+     * 
+     * @returns {(Bridge|null)}
+     */
+    getBridge(version_code, generate_new = true) {
+        let bridge = this.bridge_map[version_code] || null
+
+        if (bridge === null && generate_new) {
+            bridge = new Bridge({ version: version_code })
+            this.addBridges(bridge)
+        }
+
+        return bridge
     }
 
     /**
