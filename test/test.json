@@ -1,5 +1,56 @@
 [
     {
+        "version": "2.1.0",
+        "description": "Tests multi-endpoint support and procedures support",
+
+        "procedures": {
+            "build_owner": [
+                {
+                    "$set": {
+                        "owner": {
+                            "object": "user"
+                        }
+                    }
+                },
+                {
+                    "$move": {
+                        "user_id": "owner.id",
+                        "user_name": "owner.name"
+                    }
+                }
+            ]
+        },
+
+        "gaps": [
+            {
+                "path": "/image/search",
+                "method": "GET",
+
+                "response": {
+                    "body": {
+                        "$procedures": {
+                            "results.$": "build_owner"
+                        }
+                    }
+                }
+            },
+            {
+                "endpoints": [
+                    "GET /image/*",
+                    "PUT /image/*",
+                    "POST /image/*",
+                    "DELETE /image/*"
+                ],
+                
+                "response": {
+                    "body": {
+                        "$procedures": "build_owner"
+                    }
+                }
+            }
+        ]
+    },
+    {
         "version": "2.0.0",
         "description": "All user endpoints are wrapped in arrays",
         "gaps": [
@@ -18,6 +69,7 @@
     {
         "version": "1.1.0",
         "description": "Added social interactions to users, removed 'object' field",
+        
         "gaps": [
             {
                 "path": "/user/search",
