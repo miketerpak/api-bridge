@@ -68,4 +68,34 @@ describe('Bridge', function() {
 			assert.equal(bridge.getGap('GET', '/car').description, 'testing321')
 		})
 	})
+
+	describe('#setProcedures', function() {
+		it('should performed the programatically added procedures', function() {
+			const bridge = new Bridge({
+				version: '1.0'
+			})
+			const gap = new Gap({
+				bridge,
+				path: '/test',
+				response: {
+					body: {
+						$procedures: {
+							'.': 'testFunc'
+						}
+					}
+				}
+			})
+			bridge.addGap(gap)
+			bridge.setProcedures('testFunc', function(obj) {
+				obj.isTestSuccessful = true
+				return obj
+			})
+
+			assert.notEqual(gap, undefined)
+
+			let obj = { testCode: 5 }
+			obj = gap.response('body').process(obj)
+			assert.deepStrictEqual(obj, { testCode: 5, isTestSuccessful: true })
+		})
+	})
 })

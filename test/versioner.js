@@ -88,7 +88,7 @@ describe('Versioner', function() {
 			req.path = '/user/test'
 			res.locals.version = '1.0'
 
-			versioner.middleware()(req, res, () => {})
+			// versioner.middleware()(req, res, () => {})
 			versioner.errorHandler()({ test: 'ing' }, req, res, () => {})
 		})
 	})

@@ -8,10 +8,9 @@ const Operations = require('./lib/Operations')
 
 /**
  * TODO
- *      - Ability to define arrays in url for creating multiple identical gaps
- *      - Ability to define operation sets within a bridge to be references by gaps
  *      - Multi-file support
  *      - Response status can be set or mapped with an object in gap response?
+ *      - Test ability to recursively call a bridge procedure, as well as call other procedures of the same bridge
  */
 
 class Versioner {
@@ -25,7 +24,8 @@ class Versioner {
      * @param {Bridge[]} [options.bridges=[]] any programatically generated Bridges
      */
     constructor({ path, versionKey = 'version', bridges = [] } = {}) {
-        this.bridges = []
+        this.bridges = [] // Stores the bridges in version-order so that it can be traversed linearly in order to apply any necessary version changes
+        this.bridge_map = {} // Used to reference bridges by version string
         this.versionKey = versionKey
 
         if (!Array.isArray(bridges)) {
@@ -55,29 +55,51 @@ class Versioner {
             }
 
             this.bridges.push(_bridge)
+            this.bridge_map[_bridge.version] = _bridge
         }
 
         this.bridges.sort((a, b) => a.compareVersions(b))
     }
 
     /**
+     * Gets a bridge by version number.
+     * 
+     * @param {string} version_code
+     * @param {boolean} [generate_new=true] If true, generates a blank bridge that is added to the versioner's bridges and returned
+     * 
+     * @returns {(Bridge|null)}
+     */
+    getBridge(version_code, generate_new = true) {
+        let bridge = this.bridge_map[version_code] || null
+
+        if (bridge === null && generate_new) {
+            bridge = new Bridge({ version: version_code })
+            this.addBridges(bridge)
+        }
+
+        return bridge
+    }
+
+    /**
      * Express middleware for automatically applying formatting
      * to the server's error responses
+     * @param {string} [versionKey] Parameter within `res.locals` that contains a string representation of the request's version number. Falls back to instantiated value
      * 
-     * @see ExpressJS middleware error handler
-     * 
-     * @param {*} err error object
-     * @param {express.Request} req
-     * @param {express.Response} res
-     * @param {function} next
-     * 
-     * @returns {function[]} Middlewares in ascending order of version
+     * @returns {function} Middleware for processing errors
      */
-    errorHandler(versionKey) {
+    errorHandler(versionKey = false) {
+        versionKey = versionKey || this.versionKey
         return (err, req, res, next) => {
+            // If no version was specified, do not modify response
+            if (!res.locals[versionKey]) return next(err)
+
             // If the middleware was never called for any reason, return the unchanged error response
-            if (!res._versionerParameters) {
-                throw new Error('Error handler called before middleware! Are you missing `app.use(versioner.middleware())`?')
+            if (res._versionerParameters) {
+                res._versionerParameters.responseGaps = res._versionerParameters.responseGaps || []
+            } else {
+                res._versionerParameters = {
+                    responseGaps: this.getGaps(req.method, req.path, res.locals[versionKey])
+                }
             }
 
             let headers = {}
@@ -85,10 +107,9 @@ class Versioner {
                 headers[res._headerNames[key]] = res._headers[key]
             }
 
-            for (let _gap of res._versionerParameters.responseGaps) {
-                // TODO test if these break when not set on the Gap
-                _gap.error('headers').process(headers)
-                err = _gap.error('body').process(err)
+            for (let gap of res._versionerParameters.responseGaps) {
+                gap.error('headers').process(headers)
+                err = gap.error('body').process(err)
             }
 
             res._headers = {}
@@ -139,6 +160,7 @@ class Versioner {
         let data = JSON.parse(fs.readFileSync(path))
         let bridges = []
 
+        if (!data) return bridges;
         if (!Array.isArray(data)) data = [data]
 
         for (let _data of data) {
@@ -149,7 +171,7 @@ class Versioner {
             let _bridge = new Bridge({
                 version: _data.version,
                 description: _data.description,
-                taggedOps: _data.taggedOps
+                procedures: _data.procedures
             })
 
             for (let _gap of _data.gaps) {
@@ -199,17 +221,17 @@ class Versioner {
     middleware(versionKey = false) {
         versionKey = versionKey || this.versionKey
         return (req, res, next) => {
-            let gaps = this.getGaps(req.method, req.path, res.locals[versionKey], true)
+            let gaps = this.getGaps(req.method, req.path, res.locals[versionKey])
 
             res._versionerParameters = {
-                responseGaps: gaps // Will be in reverse order from bridges
+                responseGaps: gaps // Will be in order of oldest -> most recent versions
             }
 
-            for (let gap of gaps) {
-                gap.request('headers').process(req.headers)
-                gap.request('body').process(req.body)
-                gap.request('query').process(req.query)
-                gap.request('params').process(req.params)
+            for (let i = gaps.length - 1; i >= 0; ++i) {
+                gaps[i].request('headers').process(req.headers)
+                gaps[i].request('body').process(req.body)
+                gaps[i].request('query').process(req.query)
+                gaps[i].request('params').process(req.params)
             }
 
             let tmp = res.send.bind(res)

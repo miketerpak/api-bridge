@@ -1,9 +1,9 @@
 [
     {
         "version": "2.1.0",
-        "description": "Tests multi-endpoint support and tagged operation support",
+        "description": "Tests multi-endpoint support and procedures support",
 
-        "taggedOps": {
+        "procedures": {
             "build_owner": [
                 {
                     "$set": {
@@ -28,7 +28,7 @@
 
                 "response": {
                     "body": {
-                        "$tag": {
+                        "$procedures": {
                             "results.$": "build_owner"
                         }
                     }
@@ -44,7 +44,7 @@
                 
                 "response": {
                     "body": {
-                        "$tag": "build_owner"
+                        "$procedures": "build_owner"
                     }
                 }
             }
