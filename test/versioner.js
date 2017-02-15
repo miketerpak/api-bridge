@@ -70,7 +70,7 @@ describe('Versioner', function() {
 	})
 
 	describe('#errorHandler', function() {
-		it('should correctly process an error response object', function(done) {
+		it('should correctly process an error response object (calling #middleware)', function(done) {
 			let versioner = new Versioner({ path: './test/test.json' })
 			let { req, res } = makeRequest(result => {
 				if (!Array.isArray(result)) {
@@ -88,7 +88,27 @@ describe('Versioner', function() {
 			req.path = '/user/test'
 			res.locals.version = '1.0'
 
-			// versioner.middleware()(req, res, () => {})
+			versioner.middleware()(req, res, () => {})
+			versioner.errorHandler()({ test: 'ing' }, req, res, () => {})
+		})
+		it('should correctly process an error response object (not calling #middleware)', function(done) {
+			let versioner = new Versioner({ path: './test/test.json' })
+			let { req, res } = makeRequest(result => {
+				if (!Array.isArray(result)) {
+					done(new Error('Unexpected result; expected array, got ' + typeof result))
+				} else if (result.length !== 1) {
+					done(new Error('Unexpected result length; expected 1, got ' + result.length))
+				} else if (result[0].test !== 'ing') {
+					done(new Error('Unexpected result value; expected 1, got ' + result.length))
+				} else {
+					done()
+				}
+			})
+
+			req.method = 'GET'
+			req.path = '/user/test'
+			res.locals.version = '1.0'
+
 			versioner.errorHandler()({ test: 'ing' }, req, res, () => {})
 		})
 	})

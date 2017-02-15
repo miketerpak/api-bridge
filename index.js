@@ -227,7 +227,7 @@ class Versioner {
                 responseGaps: gaps // Will be in order of oldest -> most recent versions
             }
 
-            for (let i = gaps.length - 1; i >= 0; ++i) {
+            for (let i = gaps.length - 1; i >= 0; --i) {
                 gaps[i].request('headers').process(req.headers)
                 gaps[i].request('body').process(req.body)
                 gaps[i].request('query').process(req.query)
