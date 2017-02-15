@@ -85,6 +85,7 @@ describe('Bridge', function() {
 					}
 				}
 			})
+			bridge.addGap(gap)
 			bridge.setProcedures('testFunc', function(obj) {
 				obj.isTestSuccessful = true
 				return obj
