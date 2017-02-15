@@ -69,7 +69,7 @@ describe('Bridge', function() {
 		})
 	})
 
-	describe('#addProcedures', function() {
+	describe('#setProcedures', function() {
 		it('should performed the programatically added procedures', function() {
 			const bridge = new Bridge({
 				version: '1.0'

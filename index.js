@@ -10,6 +10,7 @@ const Operations = require('./lib/Operations')
  * TODO
  *      - Multi-file support
  *      - Response status can be set or mapped with an object in gap response?
+ *      - Ability to recursively call a bridge procedure, as well as call other procedures of the same bridge
  */
 
 class Versioner {
