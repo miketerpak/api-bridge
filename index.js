@@ -21,10 +21,12 @@ class Versioner {
      * 
      * @param {object} options option hash
      * @param {string} [options.path] path to a json file containing an api-bridge config
-     * @param {Bridge[]} [options.bridges] any programatically generated Bridges
+     * @param {string} [options.versionKey] key on `res.locals` containing a string representation of the version of this request
+     * @param {Bridge[]} [options.bridges=[]] any programatically generated Bridges
      */
-    constructor({ path, bridges = [] } = {}) {
+    constructor({ path, versionKey = 'version', bridges = [] } = {}) {
         this.bridges = []
+        this.versionKey = versionKey
 
         if (!Array.isArray(bridges)) {
             bridges = [bridges]
@@ -71,7 +73,7 @@ class Versioner {
      * 
      * @returns {function[]} Middlewares in ascending order of version
      */
-    errorHandler() {
+    errorHandler(versionKey) {
         return (err, req, res, next) => {
             // If the middleware was never called for any reason, return the unchanged error response
             if (!res._versionerParameters) {
@@ -96,6 +98,31 @@ class Versioner {
             res._versionerParameters.skipFormatting = true
             res.send(err) // 2nd argument for skipping response formatting
         }
+    }
+
+    /**
+     * Get an array of the gaps that are to be applied to a given request
+     * 
+     * @param {string} [method=GET] HTTP request method
+     * @param {string} [path=/] URL of request
+     * @param {string} [version=1.0] Version of this request
+     * @param {boolean} [reverse=false] If true, returns the gaps in reverse order
+     * 
+     * @returns {Gap[]}
+     */
+    getGaps(method = 'GET', path = '/', version = '1.0', reverse = false) {
+        let gaps = []
+
+        for (let bridge of this.bridges) {
+            if (bridge.compareVersions(version) <= 0) continue
+
+            let gap = bridge.getGap(method, path)
+            if (gap === undefined) continue
+
+            gaps.push(gap)
+        }
+
+        return (reverse) ? gaps.reverse() : gaps
     }
 
     /**
@@ -165,33 +192,24 @@ class Versioner {
      * Express middlewares for automatically applying formatting
      * to the server's requests and responses
      * 
-     * @param {string} [versionParam=version] Parameter within `res.locals` that contains a string representation of the request's version number
+     * @param {string} [versionKey] Parameter within `res.locals` that contains a string representation of the request's version number. Falls back to instantiated value
      * 
      * @returns {function[]} Middlewares in ascending order of version
      */
-    middleware(versionParam = 'version') {
+    middleware(versionKey = false) {
+        versionKey = versionKey || this.versionKey
         return (req, res, next) => {
+            let gaps = this.getGaps(req.method, req.path, res.locals[versionKey], true)
+
             res._versionerParameters = {
-                responseGaps: [] // Will be in reverse order from bridges
+                responseGaps: gaps // Will be in reverse order from bridges
             }
 
-            for (let bridge of this.bridges) {
-                if (bridge.compareVersions(res.locals[versionParam]) <= 0) continue
-
-                let gap = bridge.getGap(req.method, req.path)
-                if (gap === undefined) continue
-                if (gap.shouldReply(res)) {
-                    // Response was sent from inside Gap#shouldReply
-                    return
-                }
-
-                // TODO test if these break when not set on the Gap
+            for (let gap of gaps) {
                 gap.request('headers').process(req.headers)
                 gap.request('body').process(req.body)
                 gap.request('query').process(req.query)
                 gap.request('params').process(req.params)
-
-                res._versionerParameters.responseGaps.unshift(gap)
             }
 
             let tmp = res.send.bind(res)
