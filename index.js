@@ -8,8 +8,6 @@ const Operations = require('./lib/Operations')
 
 /**
  * TODO
- *      - Ability to define arrays in url for creating multiple identical gaps
- *      - Ability to define operation sets within a bridge to be references by gaps
  *      - Multi-file support
  *      - Response status can be set or mapped with an object in gap response?
  */
