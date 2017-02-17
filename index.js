@@ -91,7 +91,7 @@ class Versioner {
         versionKey = versionKey || this.versionKey
         return (err, req, res, next) => {
             // If no version was specified, do not modify response
-            if (!res.locals[versionKey]) return next(err)
+            if (!res.locals[versionKey]) return res.send(err)
 
             // If the middleware was never called for any reason, return the unchanged error response
             if (res._versionerParameters) {
