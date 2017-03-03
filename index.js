@@ -228,6 +228,11 @@ class Versioner {
             }
 
             for (let i = gaps.length - 1; i >= 0; --i) {
+                if (gaps[i].shouldReply(res)) {
+                    // Gap#shouldReply will send response automatically if applicable
+                    return;
+                }
+
                 gaps[i].request('headers').process(req.headers)
                 gaps[i].request('body').process(req.body)
                 gaps[i].request('query').process(req.query)
