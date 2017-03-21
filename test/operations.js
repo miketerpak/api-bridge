@@ -66,7 +66,7 @@ describe('Operations', function() {
         })
     })
 
-    describe.only('$unset', function() {
+    describe('$unset', function() {
         it('should unset the entire object when not passed a field', function() {
             let result = Operations.$unset(9, '')
             assert.strictEqual(result, undefined)
@@ -111,7 +111,7 @@ describe('Operations', function() {
         })
     })
 
-    describe.only('$copy', function() {
+    describe('$copy', function() {
         it('should copy the a field within an object', function() {
             let result = Operations.$copy({ hello: { there: 'sir' } }, ['hello', 'there'], ['mr'])
             assert.deepStrictEqual(result, { mr: 'sir', hello: { there: 'sir' } })
@@ -124,11 +124,11 @@ describe('Operations', function() {
 
     describe('$move', function() {
         it('should move the a field within an object', function() {
-            let result = Operations.$copy({ hello: { there: 'sir' } }, ['hello', 'there'], ['mr'])
+            let result = Operations.$move({ hello: { there: 'sir' } }, ['hello', 'there'], ['mr'])
             assert.deepStrictEqual(result, { mr: 'sir', hello: { } })
         })
         it('should move the a field within an object, creating any missing destination objects', function() {
-            let result = Operations.$copy({ hello: { there: { sir: 'how are you' } } }, ['hello', 'there'], ['hello', 'my', 'good'])
+            let result = Operations.$move({ hello: { there: { sir: 'how are you' } } }, ['hello', 'there'], ['hello', 'my', 'good'])
             assert.deepStrictEqual(result, { hello: { my: { good: { sir: 'how are you' } } } })
         })
     })

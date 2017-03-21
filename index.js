@@ -10,7 +10,7 @@ const Operations = require('./lib/Operations')
  * TODO
  *      - Multi-file support
  *      - Response status can be set or mapped with an object in gap response?
- *      - Test ability to recursively call a bridge procedure, as well as call other procedures of the same bridge
+ *      - Test ability to recursively call a bridge model, as well as call other models of the same bridge
  */
 
 class Versioner {
@@ -171,7 +171,7 @@ class Versioner {
             let _bridge = new Bridge({
                 version: _data.version,
                 description: _data.description,
-                procedures: _data.procedures
+                models: _data.models
             })
 
             for (let _gap of _data.gaps) {

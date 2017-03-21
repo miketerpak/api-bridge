@@ -69,8 +69,8 @@ describe('Bridge', function() {
 		})
 	})
 
-	describe('#setProcedures', function() {
-		it('should performed the programatically added procedures', function() {
+	describe('#setmodels', function() {
+		it('should performed the programatically added models', function() {
 			const bridge = new Bridge({
 				version: '1.0'
 			})
@@ -79,14 +79,14 @@ describe('Bridge', function() {
 				path: '/test',
 				response: {
 					body: {
-						$procedures: {
+						$models: {
 							'.': 'testFunc'
 						}
 					}
 				}
 			})
 			bridge.addGap(gap)
-			bridge.setProcedures('testFunc', function(obj) {
+			bridge.setmodels('testFunc', function(obj) {
 				obj.isTestSuccessful = true
 				return obj
 			})

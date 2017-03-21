@@ -1,9 +1,9 @@
 [
     {
         "version": "2.1.0",
-        "description": "Tests multi-endpoint support and procedures support",
+        "description": "Tests multi-endpoint support and models support",
 
-        "procedures": {
+        "models": {
             "build_owner": [
                 {
                     "$set": {
@@ -28,7 +28,7 @@
 
                 "response": {
                     "body": {
-                        "$procedures": {
+                        "$models": {
                             "results.$": "build_owner"
                         }
                     }
@@ -44,7 +44,7 @@
                 
                 "response": {
                     "body": {
-                        "$procedures": "build_owner"
+                        "$models": "build_owner"
                     }
                 }
             }
