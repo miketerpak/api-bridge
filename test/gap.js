@@ -238,7 +238,7 @@ describe('Gap', function() {
                 assert.deepStrictEqual(body, { name: 'BILLY BILLY', newParam: true })
             })
         })
-        describe.only("'query'", function() {
+        describe("'query'", function() {
             it('should properly format the request querystring', function() {
                 let query = {
                     user: {

@@ -45,13 +45,13 @@ describe('Operations', function() {
     }
 
     describe('$cast', function() {
-        it('should cast the entire object when not passed a field', function() {
-            let result = Operations.$cast('6', '', 'number')
+        it('should cast a string to a number', function() {
+            let result = Operations.$cast('6', 'number')
             assert.strictEqual(result, 6)
         })
-        it('should cast the specified object field', function() {
-            let result = Operations.$cast({ test: '4' }, 'test', 'number')
-            assert.deepStrictEqual(result, { test: 4 })
+        it('should cast a number to a string', function() {
+            let result = Operations.$cast(4, 'string')
+            assert.deepStrictEqual(result, '4')
         })
     })
 
@@ -78,40 +78,28 @@ describe('Operations', function() {
     })
 
     describe('$wrap', function() {
-        it('should wrap the root object within an object', function() {
-            let result = Operations.$wrap({ test: 6 }, 'test', 'key')
-            assert.deepEqual(result, { test: { key: 6 } })
-        })
-        it('should wrap the root object within an array', function() {
-            let result = Operations.$wrap({ test: 6 }, 'test', [])
-            assert.deepEqual(result, { test: [6] })
-        })
-        it('should wrap the root object within an object when not passed a field', function() {
-            let result = Operations.$wrap(6, '', 'key')
+        it('should wrap the value within an object', function() {
+            let result = Operations.$wrap(6, 'key')
             assert.deepEqual(result, { key: 6 })
         })
-        it('should wrap the root object within an array when not passed a field', function() {
-            let result = Operations.$wrap(6, '', [])
+        it('should wrap the value within an array', function() {
+            let result = Operations.$wrap(6, [])
             assert.deepEqual(result, [6])
         })
     })
 
     describe('$map', function() {
-        it('should map the root object when not passed a field', function() {
-            let result = Operations.$map(6, '', { 6: 'test' })
-            assert.strictEqual(result, 'test')
+        it('should map the value correctly', function() {
+            let result = Operations.$map(4, { 4: true })
+            assert.strictEqual(result, true)
         })
-        it('should map the specified object field', function() {
-            let result = Operations.$map({ test: '4' }, 'test', { 4: true })
-            assert.deepStrictEqual(result, { test: true })
-        })
-        it('should map the specified object field using default', function() {
-            let result = Operations.$map({ test: '4' }, 'test', { '': 'default', missingField: true })
-            assert.deepStrictEqual(result, { test: 'default' })
+        it('should map the value to the default', function() {
+            let result = Operations.$map(4, { '': 'default', missingField: true })
+            assert.deepStrictEqual(result, 'default')
         })
     })
 
-    describe('$copy', function() {
+    describe('$copy', function() { // TODO
         it('should copy the a field within an object', function() {
             let result = Operations.$copy({ hello: { there: 'sir' } }, ['hello', 'there'], ['mr'])
             assert.deepStrictEqual(result, { mr: 'sir', hello: { there: 'sir' } })
@@ -122,7 +110,7 @@ describe('Operations', function() {
         })
     })
 
-    describe('$move', function() {
+    describe('$move', function() { // TODO
         it('should move the a field within an object', function() {
             let result = Operations.$move({ hello: { there: 'sir' } }, ['hello', 'there'], ['mr'])
             assert.deepStrictEqual(result, { mr: 'sir', hello: { } })
@@ -160,7 +148,7 @@ describe('Operations', function() {
                     ]
                 }
 
-                obj = Operations.Set.applyOperationAt(Operations.$cast, obj, 'users.$.age', 'number')
+                obj = Operations.Set.applyOperationAt(Operations.$cast, obj, ['users', '$', 'age'], ['number'])
 
                 assert.deepStrictEqual(obj, {
                     users: [
@@ -268,24 +256,36 @@ describe('Operations', function() {
         describe('#process', function() {
             it('should correctly process a given object based on the operations', function() {
                 let now = Date.now()
-                assert.deepStrictEqual(
-                    OpSet.process({
-                        data: 'heyo this is a test',
-                        time: now
-                    }),
+                let OpSet = new Operations.Set([
+                    { $move: { 'users.$.age': 'users.$.info.age' } },
                     {
-                        result: {
-                            data: 'heyo this is a test',
-                            time: now,
-                            isTest: true,
-                            code: 705
-                        }
+                        $set: { 'timestamp': now },
+                        $cast: { 'users.1.info.age': 'number' }
+                    }
+                ])
+                let obj = {
+                    users: [
+                        { name: 'bob', age: '46' },
+                        { name: 'billy', age: '47' },
+                        { name: 'bfrank', age: '48' }
+                    ]
+                }
+
+                assert.deepStrictEqual(
+                    OpSet.process(obj),
+                    {
+                        timestamp: now,
+                        users: [
+                            { name: 'bob', info: { age: '46' } },
+                            { name: 'billy', info: { age: 47 } },
+                            { name: 'bfrank', info: { age: '48' } }
+                        ]
                     }
                 )
             })
         })
 
-        describe('#verify', function() {
+        describe.skip('#verify', function() {
             it('TODO UNFINISHED', function() {
 
             })
