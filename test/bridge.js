@@ -21,8 +21,8 @@ describe('Bridge', function() {
 				gaps: [ gap ]
 			})
 
-			assert.equal(bridge.gapMap.size, 1)
-			assert.equal(bridge.gapMap.values().next().value.description, 'testing123')
+			assert.equal(bridge.gaps.length, 1)
+			assert.equal(bridge.gaps[0].description, 'testing123')
 		})
 	})
 
@@ -86,7 +86,7 @@ describe('Bridge', function() {
 				}
 			})
 			bridge.addGap(gap)
-			bridge.setmodels('testFunc', function(obj) {
+			bridge.setModels('testFunc', function(obj) {
 				obj.isTestSuccessful = true
 				return obj
 			})

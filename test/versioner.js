@@ -63,9 +63,9 @@ describe('Versioner', function() {
 		it('should correctly load and parse json file', function() {
 			let versioner = new Versioner({ path: './test/test.json' })
 			assert.equal(versioner.bridges.length, 3)
-			assert.equal(versioner.bridges[0].gapMap.size, 1)
-			assert.equal(versioner.bridges[1].gapMap.size, 1)
-			assert.equal(versioner.bridges[2].gapMap.size, 5)
+			assert.equal(versioner.bridges[0].gaps.length, 1)
+			assert.equal(versioner.bridges[1].gaps.length, 1)
+			assert.equal(versioner.bridges[2].gaps.length, 5)
 		})
 	})
 

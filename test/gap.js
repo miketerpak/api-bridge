@@ -84,21 +84,10 @@ describe('Gap', function() {
         }
     })
 
-    describe('#hash', function() {
-        let _gap = new Gap({
-            path: '/test',
-            method: 'get'
-        })
-
-        it('should hash to an expected value', function() {
-            assert.equal(_gap.hash(), 'GET /test')
-        })
-    })
-
     describe('#test', function() {
         it('should match paths with URL params', function() {
             let _gap = new Gap({
-                path: '/user/*/update',
+                path: '/user/:name/update',
                 method: 'put'
             })
 
