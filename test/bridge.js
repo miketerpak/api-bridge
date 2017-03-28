@@ -69,7 +69,7 @@ describe('Bridge', function() {
 		})
 	})
 
-	describe('#setmodels', function() {
+	describe('#setModels', function() {
 		it('should performed the programatically added models', function() {
 			const bridge = new Bridge({
 				version: '1.0'
@@ -79,7 +79,7 @@ describe('Bridge', function() {
 				path: '/test',
 				response: {
 					body: {
-						$models: {
+						$model: {
 							'.': 'testFunc'
 						}
 					}

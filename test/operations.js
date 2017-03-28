@@ -284,11 +284,5 @@ describe('Operations', function() {
                 )
             })
         })
-
-        describe.skip('#verify', function() {
-            it('TODO UNFINISHED', function() {
-
-            })
-        })
     })
 })

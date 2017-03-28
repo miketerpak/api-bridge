@@ -28,7 +28,7 @@
 
                 "response": {
                     "body": {
-                        "$models": {
+                        "$model": {
                             "results.$": "build_owner"
                         }
                     }
@@ -44,7 +44,7 @@
                 
                 "response": {
                     "body": {
-                        "$models": "build_owner"
+                        "$model": "build_owner"
                     }
                 }
             }
