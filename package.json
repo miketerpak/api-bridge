@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/miketerpak/api-bridge#readme",
   "dependencies": {
-    "lodash": "^4.17.2"
+    "lodash": "^4.17.2",
+    "path-to-regexp": "^1.7.0"
   },
   "devDependencies": {
     "mocha": "^3.1.2"
