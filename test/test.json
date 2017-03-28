@@ -36,10 +36,10 @@
             },
             {
                 "endpoints": [
-                    "GET /image/*",
-                    "PUT /image/*",
-                    "POST /image/*",
-                    "DELETE /image/*"
+                    "GET /image/:id",
+                    "PUT /image/:id",
+                    "POST /image/:id",
+                    "DELETE /image/:id"
                 ],
                 
                 "response": {
