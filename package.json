@@ -1,6 +1,6 @@
 {
   "name": "api-bridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "API versioning compatability tool for supporting multiple API versions under a single codebase",
   "main": "index.js",
   "scripts": {
